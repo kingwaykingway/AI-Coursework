@@ -30,8 +30,8 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/Behavior Tree/ActionNode.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Q Learning/QManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Q Learning/QAgent.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/QManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/QAgent.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/QManager.cs" />
       </list>
     </option>
   </component>
@@ -79,6 +79,7 @@
       <workItem from="1641428691240" duration="1237000" />
       <workItem from="1641469166763" duration="18219000" />
       <workItem from="1641746128386" duration="12848000" />
+      <workItem from="1641998293328" duration="9644000" />
     </task>
     <servers />
   </component>

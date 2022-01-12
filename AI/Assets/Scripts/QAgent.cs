@@ -18,15 +18,19 @@ public class QAgent : MonoBehaviour
 
     // private bool _XZflip;
     // public bool XZflip => _XZflip;
+
+    private float _lastRelativePositionX;
     
-    private float _lastAxialVelocity;
-    public float LastAxialVelocity => _lastAxialVelocity;
+    private float _lastVelocityX;
+    // public float LastAxialVelocity => _lastAxialVelocity;
+    
+    private float _lastDeltaVelocityX;
 
     public Action LastAction { get; set; }
 
     public State LastState { get; set; }
 
-    private Vector3 acceleration, lastAcceleration;
+    /*private Vector3 acceleration, lastAcceleration;
     private Vector3 distanceMoved;
     private Vector3 lastDistanceMoved;
     private Vector3 last;
@@ -35,7 +39,7 @@ public class QAgent : MonoBehaviour
     {
         get => lastAcceleration;
         set => lastAcceleration = value;
-    }
+    }*/
 
 
 
@@ -52,9 +56,9 @@ public class QAgent : MonoBehaviour
             gameObject.SetActive(false);
         }
         
-        lastDistanceMoved = Vector3.zero;
+        /*lastDistanceMoved = Vector3.zero;
         distanceMoved = Vector3.zero;
-        last = ball.transform.position;
+        last = ball.transform.position;*/
         
         // Start with platform in random posture, to give the ball an initial horizontal pos. 
         // ..
@@ -62,6 +66,16 @@ public class QAgent : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            LastAction = Action.RotateClockwise;
+            RunAction(LastAction);
+        }        
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            LastAction = Action.RotateCounterclockwise;
+            RunAction(LastAction);
+        }
                 
         if (ball.transform.position.y < -5)
         {
@@ -69,16 +83,18 @@ public class QAgent : MonoBehaviour
         }
     }
 
-    public void UpdateAcceleration()
+    /*public void UpdateAcceleration()
     {
         distanceMoved = (ball.transform.position - last) * Time.deltaTime ;
         acceleration = distanceMoved - lastDistanceMoved;
         lastDistanceMoved = distanceMoved;
         last = ball.transform.position;
-    }
+    }*/
     
     void FixedUpdate()
     {
+        // Debug.Log("delta velocity X: " + _rigidbody.velocity.x + " - " + _lastVelocityX + " = " +  GetDeltaVelocityX());
+        
         // var position = ball.transform.position;
         // var scale = platform.transform.localScale;
         /*float posX = position.x / scale.x, 
@@ -117,17 +133,17 @@ public class QAgent : MonoBehaviour
 
     }
 
-    public Vector3 GetVelocity()
+    /*public Vector3 GetVelocity()
     {
         return _rigidbody.velocity;
-    }
+    }*/
 
-    public float GetBallPositionX()
+    /*public float GetBallPositionX()
     {        
         var position = ball.transform.position;
         var scale = platform.transform.localScale;
         return position.x / scale.x;
-    }
+    }*/
 
     public void RunAction(Action action)
     {
@@ -147,6 +163,28 @@ public class QAgent : MonoBehaviour
                 Debug.Log(gameObject + " enum default");
                 break;
         }
+    }
+
+    public float GetRelativePositionX()
+    {
+        return ball.transform.position.x / platform.transform.localScale.x * 2;
+    }
+
+    public float GetDeltaVelocityX()
+    {
+        return _rigidbody.velocity.x - _lastVelocityX;
+    }
+
+    public float GetDeltaDeltaVelocityX()
+    {
+        return GetDeltaVelocityX() - _lastDeltaVelocityX;
+    }
+
+    public void UpdatePhysicalStates()
+    {
+        _lastRelativePositionX = GetRelativePositionX();
+        _lastDeltaVelocityX = GetDeltaVelocityX();
+        _lastVelocityX = _rigidbody.velocity.x;
     }
 
     void ResetBall()

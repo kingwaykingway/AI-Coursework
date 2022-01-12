@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 
 public enum State
 {
-    Balanced = 0, 
+    Centered = 0, 
     Negative = 1, 
     Positive = 2
 }
@@ -21,13 +21,17 @@ public enum Action
 
 public class QManager : MonoBehaviour
 {
+    [SerializeField] [Range(0, 1)] private float stateTolerance = 0f;
+    
+    [SerializeField] [Min(0)] private float speedTolerance = 0;
+    
     // Maximum degree of rotation per frame, in absolute value. 
     // In current version, directly stands for angles to rotate per frame. 
     [SerializeField] [Range(0, 90)] private float rotationAgility = 10f;
     public float RotationAgility => rotationAgility;
     
     // 
-    [SerializeField] [Min(0)] private float accelerationTolerance = 0.5f;
+    // [SerializeField] [Min(0)] private float accelerationTolerance = 0.5f;
 
     [SerializeField] [Range(0, 1)] private float actionInterval = 0.05f;
     
@@ -43,6 +47,7 @@ public class QManager : MonoBehaviour
     private float _timer;
 
     private List<QAgent> _agents;
+
 
     void Start()
     {
@@ -73,110 +78,79 @@ public class QManager : MonoBehaviour
         
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        _timer += Time.deltaTime;
+        /*_timer += Time.deltaTime;
         if (_timer < actionInterval)
         {
             return;
-        }
+        }*/
         
-        // Debug.Log(ToString());
         
         // Evaluate actions performed, calculate reward and update Q matrix. 
         foreach (var agent in _agents)
         {
-            agent.UpdateAcceleration();
-            
-            float accelerationX = agent.Acceleration.x, 
-                lastAccelerationX = agent.LastAcceleration.x;
 
-            float reward = GetRewardRaw(agent.LastState, lastAccelerationX, accelerationX)
-                * rewardMultiplier * _timer;
+            float reward = GetReward(agent);
+                // GetReward(agent.LastState, lastAccelerationX, accelerationX) * rewardMultiplier * Time.deltaTime;
+                
             Q[(int) agent.LastState][(int) agent.LastAction] += reward;
+
+            Debug.Log(agent.GetDeltaVelocityX());
+            // Debug.Log(agent.GetRelativePositionX() + ", " + agent.GetDeltaVelocityX());
+            /*Debug.Log(agent.GetDeltaVelocityX() + " - " + agent._lastDeltaVelocityX 
+                      + " = " + (agent.GetDeltaVelocityX() - agent._lastDeltaVelocityX));   */         
+            // Debug.Log(agent._lastDeltaVelocityX);
             
-            agent.LastState = GetState(accelerationX);
+            agent.UpdatePhysicalStates();
+            
+            agent.LastState =  GetState(agent);
             agent.LastAction = SelectAction(agent.LastState);
-            agent.RunAction(agent.LastAction);
+            // agent.RunAction(agent.LastAction);
+
+            // Debug.Log(agent.LastState + ", " + agent.LastAction);
+
             
-            Debug.Log(agent.LastState + ", " + agent.LastAction);
-            Debug.Log((float) agent.Acceleration.x);
-
-            // float pos = agent.GetBallPositionX();
-            // float reward = GetRewardRaw(pos) * rewardMultiplier * Time.deltaTime;
-            // Q [(int) GetState(pos)] [(int) agent.LastAction] += reward;
-
-            // float axialVelocity = agent.XZflip 
-            //     ? agent.GetVelocity().x 
-            //     : agent.GetVelocity().z;
-            // float lastAxialVelocity = agent.LastAxialVelocity;
-            /*float reward = agent.LastAxialVelocity > axialVelocity 
-                ? agent.LastAxialVelocity - axialVelocity 
-                : ;*/
-
-            /*float reward;
-            if (Math.Abs(Mathf.Sign(lastAxialVelocity) - Mathf.Sign(axialVelocity)) < 0.01)
-            {
-                reward = Mathf.Abs(lastAxialVelocity - axialVelocity);
-            }
-            else
-            {
-                reward = Mathf.Abs(lastAxialVelocity + axialVelocity);
-            }
-            reward *= rewardMultiplier;*/
-
-            // Q[(int) agent.LastAction][(int) Mathf.Sign(lastAxialVelocity) + 1] += reward;
-
-            /*float axialVelocity = agent.XZflip 
-                ? agent.GetVelocity().x 
-                : agent.GetVelocity().z;
-            float lastAxialVelocity = agent.LastAxialVelocity;
-            float reward = GetRewardRaw(lastAxialVelocity, axialVelocity) 
-                           * rewardMultiplier * Time.deltaTime;
-            Q[(int) agent.LastAction][GetState(axialVelocity)] += reward;
-
-            Debug.Log("" + lastAxialVelocity + ", " + axialVelocity);*/
-
-            // Q[agent.GetState(agent.LastAxialVelocity)][(int) agent.LastAction] += reward;
+            // _timer = 0f;
         }
-
-        _timer = 0f;
+        Debug.Log(ToString());
     }
 
-    /*public State GetState(float pos)
+    private State GetState(QAgent agent)
     {
-        if (pos < -AccelerationTolerance)
+        if (agent.GetRelativePositionX() < -stateTolerance)
         {
-            return (State) 0;
+            return State.Negative;
         }
-        else if (pos > AccelerationTolerance)
+        else if (agent.GetRelativePositionX() > stateTolerance)
         {
-            return (State) 2;
+            return State.Positive;
         }
-        else
-        {
-            return (State) 1;
-        }
-    }*/
+        else return State.Centered;
+    }
 
-    /*float GetRewardRaw(float pos)
+    private float GetReward(QAgent agent)
     {
-        if (pos < -_accelerationTolerance)
+        // float v = agent.GetDeltaVelocityX();
+        if (agent.LastState == State.Negative)
         {
-            return pos - _accelerationTolerance;
+            return agent.GetDeltaVelocityX() > -speedTolerance
+                // ? Mathf.Abs(agent.GetDeltaVelocityX())
+                // : -Mathf.Abs(agent.GetDeltaVelocityX());
+                ? 1 : -1;
         }
-        else if (pos > AccelerationTolerance)
+        if (agent.LastState == State.Positive)
         {
-            return _accelerationTolerance - pos;
+            return agent.GetDeltaVelocityX() < speedTolerance
+                // ? Mathf.Abs(agent.GetDeltaVelocityX())
+                // : -Mathf.Abs(agent.GetDeltaVelocityX());
+                ? 1 : -1;
         }
-        else
-        {
-            // return _accelerationTolerance - Mathf.Abs(_accelerationTolerance - pos);
-            return 0;
-        }
-    }*/
 
-    private State GetState(float acceleration)
+        return 0;    // ?
+    }
+
+    /*private State GetState(float acceleration)
     {
         if (acceleration < -accelerationTolerance)
         {
@@ -204,36 +178,40 @@ public class QManager : MonoBehaviour
                 return acceleration - lastAcceleration;
         }
         return 0f;
-    }
+    }*/
     
     public Action SelectAction(State state)
     {
         float bestValue = Q[(int) state][0];
-        for (int i = 0; i < Q.Count; i++)
+        int a = 0;
+        for (int i = 0; i < Q[(int) state].Count; i++)
         {
-            if (Q[(int) state][i] - bestValue > 0.01)
+            if (Q[(int) state][i] > bestValue)
             {
                 bestValue = Q[(int) state][i];
+                a = i;
             }
             else 
-            if (Random.Range(0f, 100f) < 90)
+            // if (Random.Range(0f, 100f) < 90)
             {
-                return (Action)i;
+                // return (Action)i;
             }
         }
-        return Action.None;
+        return (Action) a;
     }
     
     string ToString()
     {
-        string s = "";
+        string s = "Q matrix: ";
         for (int i = 0; i < Q.Count; i++)
         {
+            s += "( ";
             for (int j = 0; j < Q[i].Count; j++)
             {
                 // s += (State) i + ", " + (Action) j + ", " + Q[i][j] + "  ";
                 s += Q[i][j] + "  ";
             }
+            s += ")";
             // s += '\n';
         }
         return s;
