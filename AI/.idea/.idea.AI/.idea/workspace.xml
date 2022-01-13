@@ -19,6 +19,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/TestingManager.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
@@ -30,7 +33,10 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/Behavior Tree/ActionNode.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Q Learning/QManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Q Learning/QAgent.cs" />
+        <option value="$PROJECT_DIR$/Assets/BouncingBall.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/QAgent.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/BouncingBall.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/TestingManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/QManager.cs" />
       </list>
     </option>
@@ -48,6 +54,14 @@
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
+    <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../AI_build\AI.exe" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="D:\Unity Projects\AI-Coursework\AI_build" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2" />
+    </configuration>
     <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
@@ -79,7 +93,9 @@
       <workItem from="1641428691240" duration="1237000" />
       <workItem from="1641469166763" duration="18219000" />
       <workItem from="1641746128386" duration="12848000" />
-      <workItem from="1641998293328" duration="9644000" />
+      <workItem from="1641998293328" duration="15588000" />
+      <workItem from="1642031324189" duration="6093000" />
+      <workItem from="1642089656137" duration="9363000" />
     </task>
     <servers />
   </component>

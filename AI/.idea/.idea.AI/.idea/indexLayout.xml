@@ -25,7 +25,6 @@
       <Path>Temp</Path>
       <Path>UserSettings</Path>
       <Path>obj</Path>
-      <Path>venv</Path>
     </explicitExcludes>
   </component>
 </project>
